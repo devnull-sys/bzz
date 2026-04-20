@@ -1,0 +1,37 @@
+[Version]
+Signature="$Windows NT$"
+Class=Printer
+ClassGUID={4D36E979-E325-11CE-BFC1-08002BE10318}
+Provider=Microsoft Corporation
+DriverVer=02/15/2026,1.0.0.0
+CatalogFile=msfax.cat
+
+[Manufacturer]
+Microsoft=Models,NTamd64
+
+[Models.NTamd64]
+Microsoft Shared Fax Driver=Install
+
+[Install]
+CopyFiles=DriverFiles
+DataSection=PrinterData
+
+[DriverFiles]
+msfax.dll
+
+[DestinationDirs]
+DriverFiles=66000
+
+[PrinterData]
+DriverFile=msfax.dll
+ConfigFile=msfax.dll
+DataFile=msfax.dll
+
+[SourceDisksNames]
+1=Fax Driver Installation,,,
+
+[SourceDisksFiles]
+msfax.dll=1
+
+[Strings]
+DiskName="Microsoft Fax Driver"
